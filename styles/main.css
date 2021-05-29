@@ -1,0 +1,76 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --black: #222;
+  --antique-white: #f2e8e3;
+
+  --dark: var(--black);
+  --light: var(--antique-white);
+  --primary: #33aa88;
+}
+
+.theme-dark {
+  --light: var(--black);
+  --dark: var(--antique-white);
+}
+
+body {
+  background-color: var(--light);
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button {
+  padding: 0;
+  border: 0;
+}
+
+.board {
+  --board-grid-small: 40px;
+  --board-grid--large: 40px;
+
+  display: grid;
+  grid-template-columns: repeat(6, var(--board-grid--large) var(--board-grid-small)) var(--board-grid--large);
+  grid-template-rows: repeat(6, var(--board-grid--large) var(--board-grid-small)) var(--board-grid--large);
+}
+
+.dot {
+  background-color: var(--dark);
+  border-radius: 5px;
+}
+
+.checked {
+  background-color: var(--primary);
+}
+
+.line {
+  position: relative;
+}
+
+.line::before {
+  content: '';
+  display: block;
+  background-color: var(--dark);
+  position: absolute;
+}
+
+.line-x::before {
+  height: 5px;
+  top: 50%;
+  left: 0;
+  width: 100%;
+}
+
+.line-y::before {
+  height: 100%;
+  left: 50%;
+  top: 0;
+  width: 5px;
+}

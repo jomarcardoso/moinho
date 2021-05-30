@@ -1,5 +1,5 @@
 const { fromEvent, Observable, Subject } = rxjs;
-const { scan } = rxjs.operators;
+const { scan, map } = rxjs.operators;
 const buttons = document.querySelectorAll('button');
 
 const players = {
@@ -8,44 +8,80 @@ const players = {
   NONE: 'NONE',
 };
 
-function generateBoardDots(quantity) {
-  const array = [];
-
-  for(i = 0; i < quantity; i++) {
-    array.push({
-      player: players.NONE
-    })
-  }
-
-  return array;
-}
-
-const boardDots = generateBoardDots(24);
-let currentPlayer = players.ONE;
-
 const subject = new Subject();
-const observable = fromEvent(buttons, 'click')
 
-function createDotsSubscribers() {
-  buttons.forEach((button) => {
-    subject.subscribe({
-      next: (e) => {
-        const currentPosition = e.target.dataset.position;
-        if (currentPosition === button.dataset.position) {
-          button.classList.add(`checked-${currentPlayer}`)
-          boardDots[currentPosition] = { player: currentPlayer };
+const dot0Observable = fromEvent(buttons[0], 'click').subscribe(subject);
+const dot1Observable = fromEvent(buttons[1], 'click').subscribe(subject);
+const dot2Observable = fromEvent(buttons[2], 'click').subscribe(subject);
 
-          if (currentPlayer === players.ONE) {
-            currentPlayer = players.TWO;
-          } else {
-            currentPlayer = players.ONE;
-          }
-        }
-      }
-    })
-  })
-}
+const currentPlayer = subject.subscribe({
+  next: (e) => console.log(e),
+})
 
-createDotsSubscribers();
+const dot0Subscriber = subject.subscribe({
+  next: (e) => console.log(e)
+});
 
-observable.subscribe(subject);
+const dot1Subscriber = subject.subscribe({
+  next: (e) => console.log(e)
+});
+
+const dot2Subscriber = subject.subscribe({
+  next: (e) => console.log(e)
+});
+
+// function generateBoardDots(quantity) {
+//   const array = [];
+
+//   for(i = 0; i < quantity; i++) {
+//     array.push({
+//       player: players.NONE,
+//       button: buttons[i],
+//     });
+//   }
+
+//   return array;
+// }
+
+// const boardDots = generateBoardDots(24);
+
+// const observable = fromEvent(buttons, 'click');
+
+// let currentPlayer = players.ONE;
+
+// const subject = new Subject();
+// const observable = fromEvent(buttons, 'click')
+
+// observable
+//   .pipe(
+//     scan((acc, curr) => {
+//       console.log(curr);
+
+//       return [...acc, curr]
+//     }, buttons)
+//   )
+
+// function createDotsSubscribers() {
+//   buttons.forEach((button) => {
+//     subject.subscribe({
+//       next: (e) => {
+//         const currentPosition = e.target.dataset.position;
+
+//         if (currentPosition === button.dataset.position) {
+//           button.classList.add(`checked-${currentPlayer}`)
+//           boardDots[currentPosition] = { player: currentPlayer };
+
+//           if (currentPlayer === players.ONE) {
+//             currentPlayer = players.TWO;
+//           } else {
+//             currentPlayer = players.ONE;
+//           }
+//         }
+//       }
+//     })
+//   })
+// }
+
+// createDotsSubscribers();
+
+// observable.subscribe(subject);

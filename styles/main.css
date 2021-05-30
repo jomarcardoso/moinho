@@ -6,11 +6,12 @@
 
 :root {
   --black: #222;
-  --antique-white: #f2e8e3;
+  --antique-white: #f7eed0;
 
   --dark: var(--black);
   --light: var(--antique-white);
-  --primary: #33aa88;
+  --p1: #33aa88;
+  --p2: #aa3333;
 }
 
 .theme-dark {
@@ -46,8 +47,12 @@ button {
   border-radius: 5px;
 }
 
-.checked {
-  background-color: var(--primary);
+.dot.checked-p1 {
+  background-color: var(--p1);
+}
+
+.dot.checked-p2 {
+  background-color: var(--p2);
 }
 
 .line {

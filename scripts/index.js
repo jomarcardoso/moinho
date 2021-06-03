@@ -1,13 +1,21 @@
+/**
+ * @typedef {Object} Game
+ * @property {string[]} positions
+ * @property {player} nextPlayer
+ */
+
 const { fromEvent, Observable, Subject } = rxjs;
 const { scan, map } = rxjs.operators;
-const buttons = document.querySelectorAll('button');
+const elButtons = document.querySelectorAll('button');
 
+/** @enum {string} */
 const players = {
   ONE: 'p1',
   TWO: 'p2',
   NONE: 'NONE',
 };
 
+/** @type {Game} */
 const GAME = {
   positions: [
     '',
@@ -35,134 +43,156 @@ const GAME = {
     '',
     '',
   ],
-  nextPlayer: players.ONE
-}
+  nextPlayer: players.ONE,
+};
 
 const subject = new Subject();
 
-const dot0Observable = fromEvent(buttons[0], 'click').subscribe(subject);
-const dot1Observable = fromEvent(buttons[1], 'click').subscribe(subject);
-const dot2Observable = fromEvent(buttons[2], 'click').subscribe(subject);
+Array.from(elButtons).forEach((elButton) => {
+  fromEvent(elButton, 'click').subscribe(subject);
+});
 
-const game$ = subject.pipe(scan((state = [], event) => {
-  const lastState = state[state.length - 1];
-  const index = event.target.dataset.position;
-  const positions = [...lastState.positions];
-  const { nextPlayer } = lastState;
+const game$ = subject.pipe(
+  scan(
+    (state = [], event) => {
+      const lastState = state[state.length - 1];
+      const index = event.target.dataset.position;
+      const positions = [...lastState.positions];
+      const { nextPlayer } = lastState;
 
-  positions[index] = nextPlayer;
+      positions[index] = nextPlayer;
 
-  const newState = {
-    positions,
-    nextPlayer: nextPlayer === players.ONE ? players.TWO : players.ONE,
+      /** @type {Game} */
+      const newState = {
+        positions,
+        nextPlayer: nextPlayer === players.ONE ? players.TWO : players.ONE,
+      };
+
+      return [...state, newState];
+    },
+    [GAME],
+  ),
+);
+
+function createDotSubscription(index = 0) {
+  const elButton = elButtons[index];
+
+  /** @param {Game[]} game */
+  return (game = []) => {
+    const state = game[game.length - 1];
+
+    if (state.positions[index] === players.ONE) {
+      elButton.classList.add(`checked-${players.ONE}`);
+    }
+
+    if (state.positions[index] === players.TWO) {
+      elButton.classList.add(`checked-${players.TWO}`);
+    }
   };
-
-  return [...state, newState];
-}, [GAME]));
+}
 
 const currentPlayer = game$.subscribe({
-  // next: (e) => console.log('j', e),
-})
+  /** @param {Game[]} game */
+  next: (game) => {
+    const state = game[game.length - 1];
+    const elCurrentPlayer = document.querySelector('[data-current-player]');
+
+    elCurrentPlayer.innerHTML = state.nextPlayer
+  }
+});
 
 const dot0Subscriber = game$.subscribe({
-  next: (game = []) => {
-    const state = game[game.length - 1];
-    const button = document.querySelector('[data-position="0"]');
-
-    if (state.positions[0] === players.ONE) {
-      button.classList.add(`checked-${players.ONE}`)
-    }
-
-    if (state.positions[0] === players.TWO) {
-      button.classList.add(`checked-${players.TWO}`)
-    }
-  }
+  next: createDotSubscription(0),
 });
 
 const dot1Subscriber = game$.subscribe({
-  next: (game = []) => {
-    const state = game[game.length - 1];
-    const button = document.querySelector('[data-position="1"]');
-
-    if (state.positions[1] === players.ONE) {
-      button.classList.add(`checked-${players.ONE}`)
-    }
-
-    if (state.positions[1] === players.TWO) {
-      button.classList.add(`checked-${players.TWO}`)
-    }
-  }
+  next: createDotSubscription(1),
 });
 
 const dot2Subscriber = game$.subscribe({
-  next: (game = []) => {
-    const state = game[game.length - 1];
-    const button = document.querySelector('[data-position="2"]');
-
-    console.log(state.positions[2], players.ONE)
-
-    if (state.positions[2] === players.ONE) {
-      button.classList.add(`checked-${players.ONE}`)
-    }
-
-    if (state.positions[2] === players.TWO) {
-      button.classList.add(`checked-${players.TWO}`)
-    }
-  }
+  next: createDotSubscription(2),
 });
 
-// function generateBoardDots(quantity) {
-//   const array = [];
+const dot3Subscriber = game$.subscribe({
+  next: createDotSubscription(3),
+});
 
-//   for(i = 0; i < quantity; i++) {
-//     array.push({
-//       player: players.NONE,
-//       button: buttons[i],
-//     });
-//   }
+const dot4Subscriber = game$.subscribe({
+  next: createDotSubscription(4),
+});
 
-//   return array;
-// }
+const dot5Subscriber = game$.subscribe({
+  next: createDotSubscription(5),
+});
 
-// const boardDots = generateBoardDots(24);
+const dot6Subscriber = game$.subscribe({
+  next: createDotSubscription(6),
+});
 
-// const observable = fromEvent(buttons, 'click');
+const dot7Subscriber = game$.subscribe({
+  next: createDotSubscription(7),
+});
 
-// let currentPlayer = players.ONE;
+const dot8Subscriber = game$.subscribe({
+  next: createDotSubscription(8),
+});
 
-// const subject = new Subject();
-// const observable = fromEvent(buttons, 'click')
+const dot9Subscriber = game$.subscribe({
+  next: createDotSubscription(9),
+});
 
-// observable
-//   .pipe(
-//     scan((acc, curr) => {
-//       console.log(curr);
+const dot10Subscriber = game$.subscribe({
+  next: createDotSubscription(10),
+});
 
-//       return [...acc, curr]
-//     }, buttons)
-//   )
+const dot11Subscriber = game$.subscribe({
+  next: createDotSubscription(11),
+});
 
-// function createDotsSubscribers() {
-//   buttons.forEach((button) => {
-//     subject.subscribe({
-//       next: (e) => {
-//         const currentPosition = e.target.dataset.position;
+const dot12Subscriber = game$.subscribe({
+  next: createDotSubscription(12),
+});
 
-//         if (currentPosition === button.dataset.position) {
-//           button.classList.add(`checked-${currentPlayer}`)
-//           boardDots[currentPosition] = { player: currentPlayer };
+const dot13Subscriber = game$.subscribe({
+  next: createDotSubscription(13),
+});
 
-//           if (currentPlayer === players.ONE) {
-//             currentPlayer = players.TWO;
-//           } else {
-//             currentPlayer = players.ONE;
-//           }
-//         }
-//       }
-//     })
-//   })
-// }
+const dot14Subscriber = game$.subscribe({
+  next: createDotSubscription(14),
+});
 
-// createDotsSubscribers();
+const dot15Subscriber = game$.subscribe({
+  next: createDotSubscription(15),
+});
 
-// observable.subscribe(subject);
+const dot16Subscriber = game$.subscribe({
+  next: createDotSubscription(16),
+});
+
+const dot17Subscriber = game$.subscribe({
+  next: createDotSubscription(17),
+});
+
+const dot18Subscriber = game$.subscribe({
+  next: createDotSubscription(18),
+});
+
+const dot19Subscriber = game$.subscribe({
+  next: createDotSubscription(19),
+});
+
+const dot20Subscriber = game$.subscribe({
+  next: createDotSubscription(20),
+});
+
+const dot21Subscriber = game$.subscribe({
+  next: createDotSubscription(21),
+});
+
+const dot22Subscriber = game$.subscribe({
+  next: createDotSubscription(22),
+});
+
+const dot23Subscriber = game$.subscribe({
+  next: createDotSubscription(23),
+});

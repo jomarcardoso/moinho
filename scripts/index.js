@@ -1,12 +1,22 @@
 /**
+ * @typedef {Object} Player
+ * @property {number} quantityRemaingPieces
+ * @property {number} quantityEnemyPieces
+ */
+
+/**
  * @typedef {Object} Game
  * @property {string[]} positions
  * @property {player} nextPlayer
+ * @property {Player} p1
+ * @property {Player} p2
  */
 
 const { fromEvent, Observable, Subject } = rxjs;
 const { scan, map } = rxjs.operators;
 const elButtons = document.querySelectorAll('button');
+const elP1RemaingPieces = document.querySelectorAll('[data-remaining-piece-p1]');
+const elP2RemaingPieces = document.querySelectorAll('[data-remaining-piece-p2]');
 
 /** @enum {string} */
 const players = {
@@ -44,6 +54,14 @@ const GAME = {
     '',
   ],
   nextPlayer: players.ONE,
+  p1: {
+    quantityEnemyPieces: 0,
+    quantityRemaingPieces: 9,
+  },
+  p2: {
+    quantityEnemyPieces: 0,
+    quantityRemaingPieces: 9,
+  },
 };
 
 const subject = new Subject();
@@ -54,11 +72,14 @@ Array.from(elButtons).forEach((elButton) => {
 
 const game$ = subject.pipe(
   scan(
+    /** @param {Game[]} state */
     (state = [], event) => {
       const lastState = state[state.length - 1];
       const index = event.target.dataset.position;
       const positions = [...lastState.positions];
       const { nextPlayer } = lastState;
+      const p1 = { ...lastState.p1 };
+      const p2 = { ...lastState.p2 };
 
       positions[index] = nextPlayer;
 
@@ -66,6 +87,20 @@ const game$ = subject.pipe(
       const newState = {
         positions,
         nextPlayer: nextPlayer === players.ONE ? players.TWO : players.ONE,
+        p1: {
+          ...p1,
+          quantityRemaingPieces:
+            nextPlayer === players.ONE
+              ? p1.quantityRemaingPieces - 1
+              : p1.quantityRemaingPieces,
+        },
+        p2: {
+          ...p2,
+          quantityRemaingPieces:
+            nextPlayer === players.ONE
+              ? p2.quantityRemaingPieces - 1
+              : p2.quantityRemaingPieces,
+        },
       };
 
       return [...state, newState];
@@ -74,11 +109,26 @@ const game$ = subject.pipe(
   ),
 );
 
-function createDotSubscription(index = 0) {
-  const elButton = elButtons[index];
-
+function createRemainingPieceSubscription(elPiece, index = 0) {
   /** @param {Game[]} game */
-  return (game = []) => {
+  function subscription(game = []) {
+    const state = game[game.length - 1];
+
+    if (state.nextPlayer === players.TWO && state.p1.quantityRemaingPieces < index + 1) {
+      elPiece.classList.remove('p1');
+    }
+
+    if (state.nextPlayer === players.ONE && state.p2.quantityRemaingPieces < index + 1) {
+      elPiece.classList.remove('p2');
+    }
+  }
+
+  return subscription;
+}
+
+function createDotSubscription(elButton, index = 0) {
+  /** @param {Game[]} game */
+  function subscription(game = []) {
     const state = game[game.length - 1];
 
     if (state.positions[index] === players.ONE) {
@@ -89,6 +139,8 @@ function createDotSubscription(index = 0) {
       elButton.classList.add(`checked-${players.TWO}`);
     }
   };
+
+  return subscription;
 }
 
 const currentPlayer = game$.subscribe({
@@ -97,102 +149,24 @@ const currentPlayer = game$.subscribe({
     const state = game[game.length - 1];
     const elCurrentPlayer = document.querySelector('[data-current-player]');
 
-    elCurrentPlayer.innerHTML = state.nextPlayer
-  }
+    elCurrentPlayer.innerHTML = state.nextPlayer;
+  },
 });
 
-const dot0Subscriber = game$.subscribe({
-  next: createDotSubscription(0),
+elButtons.forEach((elButton, index) => {
+  game$.subscribe({
+    next: createDotSubscription(elButton, index),
+  });
 });
 
-const dot1Subscriber = game$.subscribe({
-  next: createDotSubscription(1),
+elP1RemaingPieces.forEach((elPiece, index) => {
+  game$.subscribe({
+    next: createRemainingPieceSubscription(elPiece, index),
+  });
 });
 
-const dot2Subscriber = game$.subscribe({
-  next: createDotSubscription(2),
-});
-
-const dot3Subscriber = game$.subscribe({
-  next: createDotSubscription(3),
-});
-
-const dot4Subscriber = game$.subscribe({
-  next: createDotSubscription(4),
-});
-
-const dot5Subscriber = game$.subscribe({
-  next: createDotSubscription(5),
-});
-
-const dot6Subscriber = game$.subscribe({
-  next: createDotSubscription(6),
-});
-
-const dot7Subscriber = game$.subscribe({
-  next: createDotSubscription(7),
-});
-
-const dot8Subscriber = game$.subscribe({
-  next: createDotSubscription(8),
-});
-
-const dot9Subscriber = game$.subscribe({
-  next: createDotSubscription(9),
-});
-
-const dot10Subscriber = game$.subscribe({
-  next: createDotSubscription(10),
-});
-
-const dot11Subscriber = game$.subscribe({
-  next: createDotSubscription(11),
-});
-
-const dot12Subscriber = game$.subscribe({
-  next: createDotSubscription(12),
-});
-
-const dot13Subscriber = game$.subscribe({
-  next: createDotSubscription(13),
-});
-
-const dot14Subscriber = game$.subscribe({
-  next: createDotSubscription(14),
-});
-
-const dot15Subscriber = game$.subscribe({
-  next: createDotSubscription(15),
-});
-
-const dot16Subscriber = game$.subscribe({
-  next: createDotSubscription(16),
-});
-
-const dot17Subscriber = game$.subscribe({
-  next: createDotSubscription(17),
-});
-
-const dot18Subscriber = game$.subscribe({
-  next: createDotSubscription(18),
-});
-
-const dot19Subscriber = game$.subscribe({
-  next: createDotSubscription(19),
-});
-
-const dot20Subscriber = game$.subscribe({
-  next: createDotSubscription(20),
-});
-
-const dot21Subscriber = game$.subscribe({
-  next: createDotSubscription(21),
-});
-
-const dot22Subscriber = game$.subscribe({
-  next: createDotSubscription(22),
-});
-
-const dot23Subscriber = game$.subscribe({
-  next: createDotSubscription(23),
+elP2RemaingPieces.forEach((elPiece, index) => {
+  game$.subscribe({
+    next: createRemainingPieceSubscription(elPiece, index),
+  });
 });

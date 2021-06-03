@@ -3,7 +3,7 @@ module.exports = {
   arrowParens: 'always',
   singleQuote: true,
   endOfLine: 'auto',
-  printWidth: 100,
+  printWidth: 80,
   tabWidth: 2,
   parser: 'typescript',
 };

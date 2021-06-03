@@ -80,3 +80,31 @@ button {
   top: 0;
   width: 5px;
 }
+
+.game {
+  display: flex;
+}
+
+.piece {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: var(--dark);
+}
+
+.piece.p1 {
+  background-color: var(--p1);
+}
+
+.piece.p2 {
+  background-color: var(--p2);
+}
+
+.remaining-pieces .piece {
+  margin-bottom: 10px;
+}
+
+.game .board {
+  margin: 0 20px;
+}

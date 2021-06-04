@@ -13,16 +13,20 @@
  */
 
 const { fromEvent, Observable, Subject } = rxjs;
-const { scan, map } = rxjs.operators;
+const { scan, map, partition } = rxjs.operators;
 const elButtons = document.querySelectorAll('button');
-const elP1RemaingPieces = document.querySelectorAll('[data-remaining-piece-p1]');
-const elP2RemaingPieces = document.querySelectorAll('[data-remaining-piece-p2]');
+const elP1RemaingPieces = document.querySelectorAll(
+  '[data-remaining-piece-p1]',
+);
+const elP2RemaingPieces = document.querySelectorAll(
+  '[data-remaining-piece-p2]',
+);
 
 /** @enum {string} */
 const players = {
   ONE: 'p1',
   TWO: 'p2',
-  NONE: 'NONE',
+  NONE: '',
 };
 
 /** @type {Game} */
@@ -70,13 +74,41 @@ Array.from(elButtons).forEach((elButton) => {
   fromEvent(elButton, 'click').subscribe(subject);
 });
 
+// const gameStates$ = subject.pipe(
+//   scan(
+//     /**
+//      * @param {Game[]} state
+//      * @param {event} event
+//      * */
+//     (state = [], event) => {
+//       const lastState = state[state.length - 1];
+//       const index = event.target.dataset.position;
+//     },
+//   [GAME],
+//   )
+// )
+
+// const [put$, move$] = partition(subject, () => )
+
 const game$ = subject.pipe(
   scan(
-    /** @param {Game[]} state */
+    /**
+     * @param {Game[]} state
+     * @param {event} event
+     * */
     (state = [], event) => {
       const lastState = state[state.length - 1];
       const index = event.target.dataset.position;
       const positions = [...lastState.positions];
+
+      if (
+        positions[index] !== players.NONE ||
+        (lastState.p1.quantityRemaingPieces === 0 &&
+          lastState.p2.quantityRemaingPieces === 0)
+      ) {
+        return [...state];
+      }
+
       const { nextPlayer } = lastState;
       const p1 = { ...lastState.p1 };
       const p2 = { ...lastState.p2 };
@@ -97,7 +129,7 @@ const game$ = subject.pipe(
         p2: {
           ...p2,
           quantityRemaingPieces:
-            nextPlayer === players.ONE
+            nextPlayer === players.TWO
               ? p2.quantityRemaingPieces - 1
               : p2.quantityRemaingPieces,
         },
@@ -114,11 +146,17 @@ function createRemainingPieceSubscription(elPiece, index = 0) {
   function subscription(game = []) {
     const state = game[game.length - 1];
 
-    if (state.nextPlayer === players.TWO && state.p1.quantityRemaingPieces < index + 1) {
+    if (
+      state.nextPlayer === players.TWO &&
+      state.p1.quantityRemaingPieces < index + 1
+    ) {
       elPiece.classList.remove('p1');
     }
 
-    if (state.nextPlayer === players.ONE && state.p2.quantityRemaingPieces < index + 1) {
+    if (
+      state.nextPlayer === players.ONE &&
+      state.p2.quantityRemaingPieces < index + 1
+    ) {
       elPiece.classList.remove('p2');
     }
   }
@@ -138,7 +176,7 @@ function createDotSubscription(elButton, index = 0) {
     if (state.positions[index] === players.TWO) {
       elButton.classList.add(`checked-${players.TWO}`);
     }
-  };
+  }
 
   return subscription;
 }

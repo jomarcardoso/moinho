@@ -30,6 +30,10 @@ body {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
+ul {
+  padding-left: 0;
+}
+
 button {
   padding: 0;
   border: 0;
@@ -84,6 +88,7 @@ button {
 
 .game {
   display: flex;
+  align-items: center;
 }
 
 .piece {
@@ -107,5 +112,5 @@ button {
 }
 
 .game .board {
-  margin: 0 20px;
+  margin: 0 30px;
 }

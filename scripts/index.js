@@ -101,6 +101,8 @@ const game$ = subject.pipe(
       const index = event.target.dataset.position;
       const positions = [...lastState.positions];
 
+      console.log('bs')
+
       if (
         positions[index] !== players.NONE ||
         (lastState.p1.quantityRemaingPieces === 0 &&
@@ -141,9 +143,9 @@ const game$ = subject.pipe(
   ),
 );
 
-function createRemainingPieceSubscription(elPiece, index = 0) {
-  /** @param {Game[]} game */
-  function subscription(game = []) {
+/** @param {Game[]} game */
+function updateRemainingPieces(game) {
+  function exec(elPiece, index) {
     const state = game[game.length - 1];
 
     if (
@@ -161,12 +163,13 @@ function createRemainingPieceSubscription(elPiece, index = 0) {
     }
   }
 
-  return subscription;
+  elP1RemaingPieces.forEach(exec);
+  elP2RemaingPieces.forEach(exec);
 }
 
-function createDotSubscription(elButton, index = 0) {
-  /** @param {Game[]} game */
-  function subscription(game = []) {
+/** @param {Game[]} game */
+function updateDots(game = []) {
+  elButtons.forEach((elButton, index) => {
     const state = game[game.length - 1];
 
     if (state.positions[index] === players.ONE) {
@@ -176,35 +179,30 @@ function createDotSubscription(elButton, index = 0) {
     if (state.positions[index] === players.TWO) {
       elButton.classList.add(`checked-${players.TWO}`);
     }
-  }
-
-  return subscription;
+  });
 }
 
-const currentPlayer = game$.subscribe({
+function createUpdateCurrentPlayer() {
+  const elCurrentPlayer = document.querySelector('[data-current-player]');
+
   /** @param {Game[]} game */
-  next: (game) => {
+  function exec(game) {
     const state = game[game.length - 1];
-    const elCurrentPlayer = document.querySelector('[data-current-player]');
+
 
     elCurrentPlayer.innerHTML = state.nextPlayer;
-  },
-});
+  }
 
-elButtons.forEach((elButton, index) => {
-  game$.subscribe({
-    next: createDotSubscription(elButton, index),
-  });
-});
+  return exec;
+};
 
-elP1RemaingPieces.forEach((elPiece, index) => {
-  game$.subscribe({
-    next: createRemainingPieceSubscription(elPiece, index),
-  });
-});
+const updateCurrentPlayer = createUpdateCurrentPlayer();
 
-elP2RemaingPieces.forEach((elPiece, index) => {
-  game$.subscribe({
-    next: createRemainingPieceSubscription(elPiece, index),
-  });
+game$.subscribe({
+  /** @param {Game[]} game */
+  next: (game) => {
+    updateDots(game);
+    updateCurrentPlayer(game);
+    updateRemainingPieces(game);
+  }
 });

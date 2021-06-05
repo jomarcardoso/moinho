@@ -2,8 +2,9 @@
  * @typedef { import("./types").Player } Player
  * @typedef { import("./types").Game } Game
  */
+
 (() => {
-  const { putPieces, PlayerId } = moinho;
+  const { putPieces, PlayerId, GAME, movePieces } = moinho;
   const { fromEvent, Subject } = rxjs;
   const { scan } = rxjs.operators;
   const elButtons = document.querySelectorAll('button');
@@ -14,66 +15,11 @@
     '[data-remaining-piece-p2]',
   );
 
-  /** @type {Game} */
-  const GAME = {
-    positions: [
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-    ],
-    nextPlayer: PlayerId.ONE,
-    p1: {
-      quantityEnemyPieces: 0,
-      quantityRemaingPieces: 9,
-    },
-    p2: {
-      quantityEnemyPieces: 0,
-      quantityRemaingPieces: 9,
-    },
-  };
-
   const subject = new Subject();
 
   Array.from(elButtons).forEach((elButton) => {
     fromEvent(elButton, 'click').subscribe(subject);
   });
-
-  // const gameStates$ = subject.pipe(
-  //   scan(
-  //     /**
-  //      * @param {Game[]} state
-  //      * @param {event} event
-  //      * */
-  //     (state = [], event) => {
-  //       const lastState = state[state.length - 1];
-  //       const index = event.target.dataset.position;
-  //     },
-  //   [GAME],
-  //   )
-  // )
-
-  // const [put$, move$] = partition(subject, () => )
 
   const game$ = subject.pipe(
     scan(
@@ -82,11 +28,10 @@
        * @param {event} event
        * */
       (state = [], event) => {
-        console.log(state);
         const lastState = state[state.length - 1];
         const noneRemainingPieces = !(lastState.p1.quantityRemaingPieces + lastState.p2.quantityRemaingPieces);
 
-        if (noneRemainingPieces) return [...state];
+        if (noneRemainingPieces) return movePieces(state, event);
 
         return putPieces(state, event);
       },
@@ -125,10 +70,28 @@
 
       if (state.positions[index] === PlayerId.ONE) {
         elButton.classList.add(`checked-${PlayerId.ONE}`);
+      } else {
+        elButton.classList.remove(`checked-${PlayerId.ONE}`);
       }
 
       if (state.positions[index] === PlayerId.TWO) {
         elButton.classList.add(`checked-${PlayerId.TWO}`);
+      } else {
+        elButton.classList.remove(`checked-${PlayerId.TWO}`);
+      }
+    });
+  }
+
+  /** @param {Game[]} game */
+  function updateSelectedDot(game = []) {
+    const lastState = game[game.length - 1];
+    const { selectedPiece = 0 } = lastState;
+
+    elButtons.forEach((elButton, index) => {
+      if (index === selectedPiece - 1) {
+        elButton.classList.add('selected');
+      } else {
+        elButton.classList.remove('selected');
       }
     });
   }
@@ -152,9 +115,11 @@
   game$.subscribe({
     /** @param {Game[]} game */
     next: (game) => {
+      // console.log(game[game.length - 1].positions)
       updateDots(game);
       updateCurrentPlayer(game);
       updateRemainingPieces(game);
+      updateSelectedDot(game);
     }
   });
 })();

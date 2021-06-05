@@ -4,7 +4,6 @@
  * @returns {Game[]}
  * */
 moinho.putPieces = (state = [], event) => {
-  console.log(state);
   const { PlayerId } = moinho;
   const lastState = state[state.length - 1];
   const index = event.target.dataset.position;

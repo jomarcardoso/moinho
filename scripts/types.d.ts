@@ -22,8 +22,9 @@ export interface Player {
  * @property {Player} p2
  */
 export interface Game {
-  position: Array<string>;
+  positions: Array<string>;
   nextPlayer: PlayerId;
   p1: Player;
   p2: Player;
+  selectedPiece: number;
 }

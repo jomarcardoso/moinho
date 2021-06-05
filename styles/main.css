@@ -51,6 +51,7 @@ button {
 .dot {
   background-color: var(--dark);
   border-radius: 5px;
+  border: 5px solid var(--dark);
 }
 
 .dot.checked-p1 {
@@ -59,6 +60,14 @@ button {
 
 .dot.checked-p2 {
   background-color: var(--p2);
+}
+
+.dot.checked-p1.selected {
+  border-color: var(--p1);
+}
+
+.dot.checked-p2.selected {
+  border-color: var(--p2);
 }
 
 .line {
